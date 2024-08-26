@@ -52,7 +52,7 @@ void displayArr (elemType arr[]) {
 }
 
 void displayBucket (nodePtr B[], int size) {
-    printf("\n\n[ LOCAL BUCKET ]");
+    printf("\n\n[ LOCAL BUCKET - SIZE %d ]", size );
     int a;
     for (a = 0; a < size; ++a) {
         printf("\n[%2d] ::", a);
@@ -68,13 +68,15 @@ void displayBucket (nodePtr B[], int size) {
 }
 
 void bucketSort (elemType inputArr[], elemType outputArr[]) {
-    //! find the maximum element from the input array
+    //! find the maximum and minimum element from the input array
     int x;
     elemType maxVal = inputArr[0], minVal = inputArr[0];
     for (x = 1; x < MAX; ++x) {
         if (inputArr[x] > maxVal) maxVal = inputArr[x];
         if (inputArr[x] < minVal) minVal = inputArr[x];
     }
+
+    printf("\n\nMIN = %.2f :: MAX = %.2f", minVal, maxVal);
 
     //! declare bucket array or an array of node pointers
     int bucketSize = (maxVal - minVal) * 10;
