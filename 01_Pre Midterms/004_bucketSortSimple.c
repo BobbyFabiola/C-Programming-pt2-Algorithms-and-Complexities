@@ -13,14 +13,11 @@ typedef struct node {
     float data;
     struct node *link;
 } *nodePtr;
-
-typedef nodePtr bucketType[MAX];
 typedef float elemType;
 
 void displayArr (elemType arr[]);
-void initializeBucket (bucketType B);
-void displayBucket (bucketType B);
-void bucketSort (elemType inputArr[], elemType outputArr[], bucketType B);
+void displayBucket (nodePtr B[], int size);
+void bucketSort (elemType inputArr[], elemType outputArr[]);
 
 int main () {
     system("CLS");
@@ -33,12 +30,7 @@ int main () {
     printf("\n[ INPUT ARRAY ]\n");
     displayArr (inputArr);
     
-    bucketType localBucket;             //declare bucket array or an array of node pointers
-    initializeBucket (localBucket);
-    displayBucket (localBucket);    
-
-    bucketSort (inputArr, outputArr, localBucket);
-    displayBucket (localBucket);
+    bucketSort (inputArr, outputArr);
 
     printf("\n\n[ OUTPUT ARRAY ]\n");
     displayArr (outputArr);
@@ -59,17 +51,10 @@ void displayArr (elemType arr[]) {
     printf("}");
 }
 
-void initializeBucket (bucketType B) {
-    int a;
-    for (a = 0; a < MAX; ++a) {
-        B[a] = NULL;
-    }
-}
-
-void displayBucket (bucketType B) {
+void displayBucket (nodePtr B[], int size) {
     printf("\n\n[ LOCAL BUCKET ]");
     int a;
-    for (a = 0; a < MAX; ++a) {
+    for (a = 0; a < size; ++a) {
         printf("\n[%2d] ::", a);
         if (B[a] != NULL) {
             nodePtr trav;
@@ -82,19 +67,28 @@ void displayBucket (bucketType B) {
     }
 }
 
-void bucketSort (elemType inputArr[], elemType outputArr[], bucketType B) {
+void bucketSort (elemType inputArr[], elemType outputArr[]) {
+    //! find the maximum element from the input array
     int x;
-    elemType maxVal = inputArr[0];      //find the maximum element from the input array
-    for (x = 0; x < MAX; ++x) {
-        if (inputArr[x] > maxVal) {
-            maxVal = inputArr[x];
-        }
+    elemType maxVal = inputArr[0], minVal = inputArr[0];
+    for (x = 1; x < MAX; ++x) {
+        if (inputArr[x] > maxVal) maxVal = inputArr[x];
+        if (inputArr[x] < minVal) minVal = inputArr[x];
     }
+
+    //! declare bucket array or an array of node pointers
+    int bucketSize = (maxVal - minVal) * 10;
+    nodePtr localBucket[bucketSize];                
+    for (x = 0; x < bucketSize; ++x) {
+        localBucket[x] = NULL;
+    }
+    displayBucket (localBucket, bucketSize);
     
+    //! placing each element into the buckets
     nodePtr *trav, temp;
-    for (x = 0; x < MAX; ++x) {         //placing each element into the buckets
-        int idx = (int) (inputArr[x] * MAX);
-        for (trav = &(B[idx]); *trav != NULL && (*trav)->data <= inputArr[x]; trav = &(*trav)->link) {}
+    for (x = 0; x < MAX; ++x) {
+        int idx = (int) ((inputArr[x] - minVal) * (bucketSize - 1) / (maxVal - minVal));
+        for (trav = &localBucket[idx]; *trav != NULL && (*trav)->data <= inputArr[x]; trav = &(*trav)->link) {}
         temp = malloc (sizeof (struct node));
         if (temp != NULL) {
             temp->data = inputArr[x];
@@ -102,10 +96,12 @@ void bucketSort (elemType inputArr[], elemType outputArr[], bucketType B) {
             *trav = temp;
         }
     }
+    displayBucket (localBucket, bucketSize);
 
-    int a, b = 0;                       //concatenating the list for each bucket into the output array
-    for (a = 0; a < MAX; ++a) {
-        for (temp = B[a]; temp != NULL; temp = temp->link) {
+    //! concatenating the list for each bucket into the output array
+    int a, b = 0;                       
+    for (a = 0; a < bucketSize; ++a) {
+        for (temp = localBucket[a]; temp != NULL; temp = temp->link) {
             outputArr[b++] = temp->data;
         }
     }
