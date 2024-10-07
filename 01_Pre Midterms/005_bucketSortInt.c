@@ -7,13 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX 10
+#define MAX 15
 
 typedef struct node {
-    float data;
+    int data;
     struct node *link;
 } *nodePtr;
-typedef float elemType;
+typedef int elemType;
 
 void displayArr (elemType arr[]);
 void displayBucket (nodePtr B[], int size);
@@ -24,8 +24,7 @@ int main () {
     printf("START\n");
 
     int x;
-    // elemType arr[MAX] = {0.42, 0.65, 0.32, 0.12, 0.12, 0.67, 0.24, 0.93, 0.66, 0.48};
-    elemType arr[MAX] = {0.942, 0.965, 0.932, 0.912, 0.912, 0.967, 0.924, 0.993, 0.966, 0.948};
+    elemType arr[MAX] = {25, 73, 39, 15, 61, 37, 58, 64, 62, 10, 44, 32, 67, 20, 12};
 
     printf("\n[ INPUT ARRAY ]\n");
     displayArr (arr);
@@ -43,7 +42,7 @@ void displayArr (elemType arr[]) {
     int x;
     printf("{");
     for (x = 0; x < MAX; ++x) {
-        printf("%.2f", arr[x]);
+        printf("%d", arr[x]);
         if (x < MAX - 1) {
             printf(", ");
         }
@@ -59,7 +58,7 @@ void displayBucket (nodePtr B[], int size) {
         if (B[a] != NULL) {
             nodePtr trav;
             for (trav = B[a]; trav != NULL; trav = trav->link) {
-                printf(" %.2f ", trav->data);
+                printf(" %d ", trav->data);
             }
         } else {
             printf(" ~ ");
@@ -68,25 +67,25 @@ void displayBucket (nodePtr B[], int size) {
 }
 
 void bucketSort (elemType arr[]) {
-    int x;
-    elemType maxVal = arr[0], minVal = arr[0];                  //! find the maximum and minimum element from the input array
+    int x;                                                  //! find the maximum and minimum element from the input array
+    elemType maxVal = arr[0], minVal = arr[0];
     for (x = 1; x < MAX; ++x) {
         if (arr[x] > maxVal) maxVal = arr[x];
         if (arr[x] < minVal) minVal = arr[x];
     }
 
-    printf("\n\nMIN = %.2f :: MAX = %.2f", minVal, maxVal);
+    printf("\n\nMIN = %d :: MAX = %d", minVal, maxVal);
 
-    int bucketSize = (maxVal - minVal) * 10;                    //! declare bucket array or an array of node pointers
-    nodePtr localBucket[bucketSize];                            //* float point number for bucket size
+    int bucketSize = (maxVal - minVal) / MAX;               //! declare bucket array or an array of node pointers
+    nodePtr localBucket[bucketSize];                        //* integer for getting bucket size
     for (x = 0; x < bucketSize; ++x) {
         localBucket[x] = NULL;
     }
     displayBucket (localBucket, bucketSize);
     
-    nodePtr *trav, temp;                                        //! placing each element into the buckets
-    for (x = 0; x < MAX; ++x) {                                 //* getting index of float point number values
-        int idx = (int) ((arr[x] - minVal) * (bucketSize - 1) / (maxVal - minVal));
+    nodePtr *trav, temp;                                    //! placing each element into the buckets
+    for (x = 0; x < MAX; ++x) {                             //* integer formula for indexing; inserted sorted
+        int idx =  (arr[x] - minVal) * (bucketSize) / (maxVal - minVal + 1);
         for (trav = &localBucket[idx]; *trav != NULL && (*trav)->data <= arr[x]; trav = &(*trav)->link) {}
         temp = malloc (sizeof (struct node));
         if (temp != NULL) {
@@ -97,11 +96,10 @@ void bucketSort (elemType arr[]) {
     }
     displayBucket (localBucket, bucketSize);
 
-    int a, b = 0;                                               //! concatenating the list for each bucket into the output array              
+    int a, b = 0;                                           //! concatenating the list for each bucket into the output array              
     for (a = 0; a < bucketSize; ++a) {
         for (temp = localBucket[a]; temp != NULL; temp = temp->link) {
             arr[b++] = temp->data;
         }
     }
 }
-
