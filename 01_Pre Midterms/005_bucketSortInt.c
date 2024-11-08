@@ -75,8 +75,8 @@ void bucketSort (elemType arr[]) {
     }
 
     printf("\n\nMIN = %d :: MAX = %d", minVal, maxVal);
-
-    int bucketSize = (maxVal - minVal) / MAX;               //! declare bucket array or an array of node pointers
+                                                            //! declare bucket array or an array of node pointers
+    int bucketSize = (maxVal - minVal < MAX) ? MAX: (maxVal - minVal) / MAX;
     nodePtr localBucket[bucketSize];                        //* integer for getting bucket size
     for (x = 0; x < bucketSize; ++x) {
         localBucket[x] = NULL;
